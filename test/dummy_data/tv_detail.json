@@ -1,0 +1,118 @@
+{
+    "adult": false,
+    "backdrop_path": "/jANJGWIKavzyREXUMCHiXFzitDO.jpg",
+    "created_by": [
+      {
+        "id": 1241049,
+        "credit_id": "62ae9ada0c3ec800619287e5",
+        "name": "Glória Perez",
+        "gender": 1,
+        "profile_path": "/A0BVaepMY2utBYr15IINDI7f0ua.jpg"
+      }
+    ],
+    "episode_run_time": [
+      60
+    ],
+    "first_air_date": "2022-10-10",
+    "genres": [
+      {
+        "id": 10766,
+        "name": "Soap"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      }
+    ],
+    "homepage": "https://gshow.globo.com/novelas/travessia/",
+    "id": 204370,
+    "in_production": true,
+    "languages": [
+      "pt"
+    ],
+    "last_air_date": "2022-11-29",
+    "last_episode_to_air": {
+      "air_date": "2022-11-29",
+      "episode_number": 44,
+      "id": 4061287,
+      "name": "Episode 44",
+      "overview": "",
+      "production_code": "",
+      "runtime": null,
+      "season_number": 1,
+      "show_id": 204370,
+      "still_path": null,
+      "vote_average": 0.0,
+      "vote_count": 0
+    },
+    "name": "Travessia",
+    "next_episode_to_air": {
+      "air_date": "2022-11-30",
+      "episode_number": 45,
+      "id": 4061288,
+      "name": "Episode 45",
+      "overview": "",
+      "production_code": "",
+      "runtime": 50,
+      "season_number": 1,
+      "show_id": 204370,
+      "still_path": null,
+      "vote_average": 0.0,
+      "vote_count": 0
+    },
+    "networks": [
+      {
+        "id": 60,
+        "name": "TV Globo",
+        "logo_path": "/K3CiSckB66dBX4P5fvbC0wT7Nh.png",
+        "origin_country": "BR"
+      }
+    ],
+    "number_of_episodes": 48,
+    "number_of_seasons": 1,
+    "origin_country": [
+      "BR"
+    ],
+    "original_language": "pt",
+    "original_name": "Travessia",
+    "overview": "",
+    "popularity": 1392.048,
+    "poster_path": "/jFZJEoPzt2RKSsZG8QEWptX5Xyw.jpg",
+    "production_companies": [
+      {
+        "id": 46430,
+        "logo_path": "/aGCY6cOXY488eOpdOnm3ZgBhEly.png",
+        "name": "Estúdios Globo",
+        "origin_country": "BR"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "BR",
+        "name": "Brazil"
+      }
+    ],
+    "seasons": [
+      {
+        "air_date": "2022-10-10",
+        "episode_count": 48,
+        "id": 297946,
+        "name": "Season 1",
+        "overview": "",
+        "poster_path": "/jFZJEoPzt2RKSsZG8QEWptX5Xyw.jpg",
+        "season_number": 1
+      }
+    ],
+    "spoken_languages": [
+      {
+        "english_name": "Portuguese",
+        "iso_639_1": "pt",
+        "name": "Português"
+      }
+    ],
+    "status": "Returning Series",
+    "tagline": "",
+    "type": "Scripted",
+    "vote_average": 4.857,
+    "vote_count": 7
+  }

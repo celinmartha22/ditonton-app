@@ -1,0 +1,26 @@
+{
+    "page": 1,
+    "results": [
+      {
+        "adult": false,
+        "backdrop_path": "backdropPath",
+        "id": 1,
+        "name": "name",
+        "original_language": "originalLanguage",
+        "original_name": "originalName",
+        "overview": "overview",
+        "poster_path": "posterPath",
+        "media_type": "tv",
+        "genre_ids": [1, 2, 3],
+        "popularity": 1,
+        "first_air_date": "firstAirDate",
+        "vote_average": 1,
+        "vote_count": 1,
+        "origin_country": [
+          "US"
+        ]
+      }
+    ],
+    "total_pages": 2,
+    "total_results": 40
+  }
