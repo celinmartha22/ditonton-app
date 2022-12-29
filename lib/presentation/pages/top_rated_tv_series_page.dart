@@ -50,28 +50,6 @@ class _TopRatedTvSeriesPageState extends State<TopRatedTvSeriesPage> {
             }
           },
         ),
-        // child: Consumer<TopRatedTvSeriesNotifier>(
-        //   builder: (context, data, child) {
-        //     if (data.state == RequestState.Loading) {
-        //       return Center(
-        //         child: CircularProgressIndicator(),
-        //       );
-        //     } else if (data.state == RequestState.Loaded) {
-        //       return ListView.builder(
-        //         itemBuilder: (context, index) {
-        //           final tv = data.tvSeries[index];
-        //           return TvCard(tv);
-        //         },
-        //         itemCount: data.tvSeries.length,
-        //       );
-        //     } else {
-        //       return Center(
-        //         key: Key('error_message'),
-        //         child: Text(data.message),
-        //       );
-        //     }
-        //   },
-        // ),
       ),
     );
   }
