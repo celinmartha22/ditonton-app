@@ -7,6 +7,8 @@ import 'package:ditonton/domain/entities/season.dart';
 import 'package:ditonton/domain/entities/tv.dart';
 import 'package:ditonton/domain/entities/tv_detail.dart';
 
+final testId = 1;
+
 final testMovie = Movie(
   adult: false,
   backdropPath: '/muth4OYamXf41G2evdrLEg8d3om.jpg',
@@ -40,7 +42,6 @@ final testTv = Tv(
   voteAverage: 7.2,
   voteCount: 13507,
 );
-
 
 final testMovieList = [testMovie];
 final testTvList = [testTv];
@@ -85,6 +86,8 @@ final testWatchlistMovie = Movie.watchlist(
   posterPath: 'posterPath',
   overview: 'overview',
 );
+final testWatchlistMovieList = [testWatchlistMovie];
+final testWatchlistStatusMovie = true;
 
 final testWatchlistTv = Tv.watchlist(
   id: 1,
@@ -92,6 +95,8 @@ final testWatchlistTv = Tv.watchlist(
   posterPath: 'posterPath',
   overview: 'overview',
 );
+final testWatchlistTvList = [testWatchlistTv];
+final testWatchlistStatusTv = true;
 
 final testMovieTable = MovieTable(
   id: 1,

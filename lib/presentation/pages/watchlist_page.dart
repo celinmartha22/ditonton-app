@@ -37,7 +37,7 @@ class _WatchlistPageState extends State<WatchlistPage>
                 ),
                 Container(
                   width: double.maxFinite,
-                  height: MediaQuery.of(context).size.height, //double.maxFinite,
+                  height: MediaQuery.of(context).size.height,
                   child: TabBarView(
                     controller: _tabController,
                     children: [WatchlistMoviesPage(), WatchlistTvSeriesPage()],

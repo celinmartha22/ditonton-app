@@ -1,15 +1,12 @@
-// ignore_for_file: unrelated_type_equality_checks
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ditonton/common/constants.dart';
 import 'package:ditonton/domain/entities/genre.dart';
 import 'package:ditonton/domain/entities/tv.dart';
 import 'package:ditonton/domain/entities/tv_detail.dart';
-import 'package:ditonton/presentation/provider/tv_detail_notifier.dart';
-import 'package:ditonton/common/state_enum.dart';
+import 'package:ditonton/presentation/bloc/detail_bloc_tv.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:provider/provider.dart';
 
 class TvDetailPage extends StatefulWidget {
   static const ROUTE_NAME = '/detail-tv';
@@ -25,36 +22,35 @@ class _TvDetailPageState extends State<TvDetailPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      Provider.of<TvDetailNotifier>(context, listen: false)
-          .fetchTvDetail(widget.id);
-      Provider.of<TvDetailNotifier>(context, listen: false)
-          .loadWatchlistStatus(widget.id);
-    });
+    BlocProvider.of<DetailBlocTv>(context)..add(GetDetailTv(widget.id));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<TvDetailNotifier>(
-        builder: (context, provider, child) {
-          if (provider.tvState == RequestState.Loading) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (provider.tvState == RequestState.Loaded) {
-            final tv = provider.tv;
-            return SafeArea(
-              child: DetailContent(
-                tv,
-                provider.tvRecommendations,
-                provider.isAddedToWatchlist,
-              ),
-            );
-          } else {
-            return Text(provider.message);
-          }
-        },
+      body: Center(
+        child: BlocBuilder<DetailBlocTv, DetailStateTv>(
+          builder: (context, state) {
+            if (state is DetailLoading) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is DetailHasData) {
+              final tv = state;
+              return SafeArea(
+                child: DetailContent(
+                  tv.detail,
+                  tv.recommendationTvSeries,
+                  tv.isAddedtoWatchlist,
+                ),
+              );
+            } else if (state is DetailError) {
+              return Text(state.message);
+            } else {
+              return Container();
+            }
+          },
+        ),
       ),
     );
   }
@@ -110,25 +106,22 @@ class DetailContent extends StatelessWidget {
                             ElevatedButton(
                               onPressed: () async {
                                 if (!isAddedWatchlist) {
-                                  await Provider.of<TvDetailNotifier>(context,
-                                          listen: false)
-                                      .addWatchlist(tv);
+                                  BlocProvider.of<DetailBlocTv>(context)
+                                    ..add(AddWatchlist(tv));
                                 } else {
-                                  await Provider.of<TvDetailNotifier>(context,
-                                          listen: false)
-                                      .removeFromWatchlist(tv);
+                                  BlocProvider.of<DetailBlocTv>(context)
+                                    ..add(RemoveFromWatchlist(tv));
                                 }
 
-                                final message = Provider.of<TvDetailNotifier>(
-                                        context,
-                                        listen: false)
-                                    .watchlistMessage;
+                                final message =
+                                    BlocProvider.of<DetailBlocTv>(context)
+                                        .watchlistMessage;
 
                                 if (message ==
-                                        TvDetailNotifier
+                                        DetailBlocTv
                                             .watchlistAddSuccessMessage ||
                                     message ==
-                                        TvDetailNotifier
+                                        DetailBlocTv
                                             .watchlistRemoveSuccessMessage) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: Text(message)));
@@ -278,18 +271,15 @@ class DetailContent extends StatelessWidget {
                               'Recommendations',
                               style: kHeading6,
                             ),
-                            Consumer<TvDetailNotifier>(
-                              builder: (context, data, child) {
-                                if (data.recommendationState ==
-                                    RequestState.Loading) {
+                            BlocBuilder<DetailBlocTv, DetailStateTv>(
+                              builder: (context, state) {
+                                if (state is DetailLoading) {
                                   return Center(
                                     child: CircularProgressIndicator(),
                                   );
-                                } else if (data.recommendationState ==
-                                    RequestState.Error) {
-                                  return Text(data.message);
-                                } else if (data.recommendationState ==
-                                    RequestState.Loaded) {
+                                } else if (state is DetailError) {
+                                  return Text(state.message);
+                                } else if (state is DetailHasData) {
                                   return Container(
                                     height: 150,
                                     child: ListView.builder(

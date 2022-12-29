@@ -1,13 +1,14 @@
+// import 'dart:js_util';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ditonton/common/constants.dart';
 import 'package:ditonton/domain/entities/genre.dart';
 import 'package:ditonton/domain/entities/movie.dart';
 import 'package:ditonton/domain/entities/movie_detail.dart';
-import 'package:ditonton/presentation/provider/movie_detail_notifier.dart';
-import 'package:ditonton/common/state_enum.dart';
+import 'package:ditonton/presentation/bloc/detail_bloc_movie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:provider/provider.dart';
 
 class MovieDetailPage extends StatefulWidget {
   static const ROUTE_NAME = '/detail-movie';
@@ -23,36 +24,36 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      Provider.of<MovieDetailNotifier>(context, listen: false)
-          .fetchMovieDetail(widget.id);
-      Provider.of<MovieDetailNotifier>(context, listen: false)
-          .loadWatchlistStatus(widget.id);
-    });
+    BlocProvider.of<DetailBlocMovie>(context)..add(GetDetailMovie(widget.id));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<MovieDetailNotifier>(
-        builder: (context, provider, child) {
-          if (provider.movieState == RequestState.Loading) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (provider.movieState == RequestState.Loaded) {
-            final movie = provider.movie;
-            return SafeArea(
-              child: DetailContent(
-                movie,
-                provider.movieRecommendations,
-                provider.isAddedToWatchlist,
-              ),
-            );
-          } else {
-            return Text(provider.message);
-          }
-        },
+      body: Center(
+        child: BlocBuilder<DetailBlocMovie, DetailStateMovie>(
+          builder: (context, state) {
+            print("MovieDetailPage => BlocBuilder state : ${state.toString()}");
+            if (state is DetailLoading) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is DetailHasData) {
+              final movie = state;
+              return SafeArea(
+                child: DetailContent(
+                  movie.detail,
+                  movie.recommendationMovies,
+                  movie.isAddedtoWatchlist,
+                ),
+              );
+            } else if (state is DetailError) {
+              return Text(state.message);
+            } else {
+              return Container();
+            }
+          },
+        ),
       ),
     );
   }
@@ -108,27 +109,21 @@ class DetailContent extends StatelessWidget {
                             ElevatedButton(
                               onPressed: () async {
                                 if (!isAddedWatchlist) {
-                                  await Provider.of<MovieDetailNotifier>(
-                                          context,
-                                          listen: false)
-                                      .addWatchlist(movie);
+                                  BlocProvider.of<DetailBlocMovie>(context)
+                                    ..add(AddWatchlist(movie));
                                 } else {
-                                  await Provider.of<MovieDetailNotifier>(
-                                          context,
-                                          listen: false)
-                                      .removeFromWatchlist(movie);
+                                  BlocProvider.of<DetailBlocMovie>(context)
+                                    ..add(RemoveFromWatchlist(movie));
                                 }
 
                                 final message =
-                                    Provider.of<MovieDetailNotifier>(context,
-                                            listen: false)
+                                    BlocProvider.of<DetailBlocMovie>(context)
                                         .watchlistMessage;
-
                                 if (message ==
-                                        MovieDetailNotifier
+                                        DetailBlocMovie
                                             .watchlistAddSuccessMessage ||
                                     message ==
-                                        MovieDetailNotifier
+                                        DetailBlocMovie
                                             .watchlistRemoveSuccessMessage) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: Text(message)));
@@ -185,18 +180,15 @@ class DetailContent extends StatelessWidget {
                               'Recommendations',
                               style: kHeading6,
                             ),
-                            Consumer<MovieDetailNotifier>(
-                              builder: (context, data, child) {
-                                if (data.recommendationState ==
-                                    RequestState.Loading) {
+                            BlocBuilder<DetailBlocMovie, DetailStateMovie>(
+                              builder: (context, state) {
+                                if (state is DetailLoading) {
                                   return Center(
                                     child: CircularProgressIndicator(),
                                   );
-                                } else if (data.recommendationState ==
-                                    RequestState.Error) {
-                                  return Text(data.message);
-                                } else if (data.recommendationState ==
-                                    RequestState.Loaded) {
+                                } else if (state is DetailError) {
+                                  return Text(state.message);
+                                } else if (state is DetailHasData) {
                                   return Container(
                                     height: 150,
                                     child: ListView.builder(

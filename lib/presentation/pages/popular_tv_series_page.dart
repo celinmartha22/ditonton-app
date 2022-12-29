@@ -1,8 +1,7 @@
-import 'package:ditonton/common/state_enum.dart';
-import 'package:ditonton/presentation/provider/popular_tv_series_notifier.dart';
+import 'package:ditonton/presentation/bloc/popular_bloc_tv.dart';
 import 'package:ditonton/presentation/widgets/tv_card_list.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PopularTvSeriesPage extends StatefulWidget {
   static const ROUTE_NAME = '/popular-tv';
@@ -15,9 +14,7 @@ class _PopularTvSeriesPageState extends State<PopularTvSeriesPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() =>
-        Provider.of<PopularTvSeriesNotifier>(context, listen: false)
-            .fetchPopularTvSeries());
+    BlocProvider.of<PopularBlocTv>(context)..add(GetPopularTv());
   }
 
   @override
@@ -28,25 +25,28 @@ class _PopularTvSeriesPageState extends State<PopularTvSeriesPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Consumer<PopularTvSeriesNotifier>(
-          builder: (context, data, child) {
-            if (data.state == RequestState.Loading) {
+        child: BlocBuilder<PopularBlocTv, PopularStateTv>(
+          builder: (context, state) {
+            if (state is PopularLoading) {
               return Center(
                 child: CircularProgressIndicator(),
               );
-            } else if (data.state == RequestState.Loaded) {
+            } else if (state is PopularHasData) {
+              final result = state.result;
               return ListView.builder(
                 itemBuilder: (context, index) {
-                  final tv = data.tvSeries[index];
+                  final tv = result[index];
                   return TvCard(tv);
                 },
-                itemCount: data.tvSeries.length,
+                itemCount: result.length,
               );
-            } else {
+            } else if (state is PopularError) {
               return Center(
                 key: Key('error_message'),
-                child: Text(data.message),
+                child: Text(state.message),
               );
+            } else {
+              return Container();
             }
           },
         ),
