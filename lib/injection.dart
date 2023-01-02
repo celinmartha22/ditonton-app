@@ -46,14 +46,24 @@ final locator = GetIt.instance;
 
 void init() {
   // bloc provider
-  locator.registerFactory(() => DetailBlocMovie(locator(), locator(), locator(), locator(), locator()));
+  locator.registerFactory(() => DetailBlocMovie(
+      getMovieDetail: locator(),
+      getMovieRecommendations: locator(),
+      getWatchListStatus: locator(),
+      saveWatchlist: locator(),
+      removeWatchlist: locator()));
   locator.registerFactory(() => NowPlayingBlocMovie(locator()));
   locator.registerFactory(() => PopularBlocMovie(locator()));
   locator.registerFactory(() => TopRatedBlocMovie(locator()));
   locator.registerFactory(() => SearchBlocMovie(locator()));
   locator.registerFactory(() => WatchlistBlocMovie(locator()));
 
-  locator.registerFactory(() => DetailBlocTv(locator(), locator(), locator(), locator(), locator()));
+  locator.registerFactory(() => DetailBlocTv(
+      getTvDetail: locator(),
+      getTvRecommendations: locator(),
+      getWatchListStatus: locator(),
+      saveWatchlist: locator(),
+      removeWatchlist: locator()));
   locator.registerFactory(() => NowPlayingBlocTv(locator()));
   locator.registerFactory(() => PopularBlocTv(locator()));
   locator.registerFactory(() => TopRatedBlocTv(locator()));

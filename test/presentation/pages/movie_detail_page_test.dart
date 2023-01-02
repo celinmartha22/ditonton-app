@@ -1,18 +1,13 @@
-// import 'package:ditonton/common/state_enum.dart';
-import 'package:ditonton/domain/entities/movie.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/presentation/bloc/detail_bloc_movie.dart';
 import 'package:ditonton/presentation/pages/movie_detail_page.dart';
-// import 'package:ditonton/presentation/provider/movie_detail_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-// import 'package:mockito/annotations.dart';
-// import 'package:mockito/mockito.dart';
 import 'package:mocktail/mocktail.dart';
-// import 'package:provider/provider.dart';
 
 import '../../dummy_data/dummy_objects.dart';
-// import 'movie_detail_page_test.mocks.dart';
 
 class MockDetailBlocMovie extends Mock implements DetailBlocMovie {}
 
@@ -45,25 +40,19 @@ void main() {
       'Watchlist button should display add icon when movie not added to watchlist',
       (WidgetTester tester) async {
     when(() => detailBlocMovie.stream)
-        .thenAnswer((_) => Stream.value(DetailLoading()));
-    when(() => detailBlocMovie.state).thenReturn(DetailLoading());
-    // when(() => detailBlocMovie.stream).thenAnswer((_) => Stream.value(
-    //     DetailHasData(testMovieDetail, testMovieList, testIsAddedToWatchlist)));
+        .thenAnswer((_) => Stream.value(DetailStateMovie.initial().copyWith(
+              movieDetail: testMovieDetail,
+              detailStateMovie: RequestState.Loaded,
+              movieRecommendationsState: RequestState.Loaded,
+              isAddedToWatchlist: false,
+            )));
     when(() => detailBlocMovie.state)
-        .thenReturn(DetailHasData(testMovieDetail, testMovieList, false));
-    when(() => detailBlocMovie.movie).thenReturn(testMovieDetail);
-    when(() => detailBlocMovie.movieRecommendations).thenReturn(<Movie>[]);
-    when(() => detailBlocMovie.isAddedToWatchlist).thenReturn(false);
-    // when(() => detailBlocMovie.stream).thenAnswer((_) => Stream.value(
-    //     DetailHasData(testMovieDetail, testMovieList, testIsAddedToWatchlist)));
-    // when(() => detailBlocMovie.).thenReturn(
-    //     DetailHasData(testMovieDetail, testMovieList, testIsAddedToWatchlist));
-
-    // when(mockBloc.movieState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.movie).thenReturn(testMovieDetail);
-    // when(mockBloc.recommendationState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.movieRecommendations).thenReturn(<Movie>[]);
-    // when(mockBloc.isAddedToWatchlist).thenReturn(false);
+        .thenReturn(DetailStateMovie.initial().copyWith(
+      movieDetail: testMovieDetail,
+      detailStateMovie: RequestState.Loaded,
+      movieRecommendationsState: RequestState.Loaded,
+      isAddedToWatchlist: false,
+    ));
 
     final watchlistButtonIcon = find.byIcon(Icons.add);
 
@@ -76,21 +65,21 @@ void main() {
       'Watchlist button should dispay check icon when movie is added to wathclist',
       (WidgetTester tester) async {
     when(() => detailBlocMovie.stream)
-        .thenAnswer((_) => Stream.value(DetailLoading()));
-    when(() => detailBlocMovie.state).thenReturn(DetailLoading());
+        .thenAnswer((_) => Stream.value(DetailStateMovie.initial().copyWith(
+              movieDetail: testMovieDetail,
+              detailStateMovie: RequestState.Loaded,
+              movieRecommendationsState: RequestState.Loaded,
+              isAddedToWatchlist: true,
+            )));
     when(() => detailBlocMovie.state)
-        .thenReturn(DetailHasData(testMovieDetail, testMovieList, true));
-    when(() => detailBlocMovie.movie).thenReturn(testMovieDetail);
-    when(() => detailBlocMovie.movieRecommendations).thenReturn(<Movie>[]);
-    when(() => detailBlocMovie.isAddedToWatchlist).thenReturn(true);
-    // when(mockBloc.movieState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.movie).thenReturn(testMovieDetail);
-    // when(mockBloc.recommendationState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.movieRecommendations).thenReturn(<Movie>[]);
-    // when(mockBloc.isAddedToWatchlist).thenReturn(true);
+        .thenReturn(DetailStateMovie.initial().copyWith(
+      movieDetail: testMovieDetail,
+      detailStateMovie: RequestState.Loaded,
+      movieRecommendationsState: RequestState.Loaded,
+      isAddedToWatchlist: true,
+    ));
 
-    // final watchlistButtonIcon = find.byIcon(Icons.check);
-    final watchlistButtonIcon = find.text('Watchlist');
+    final watchlistButtonIcon = find.byIcon(Icons.check);
 
     await tester.pumpWidget(_makeTestableWidget(MovieDetailPage(id: 1)));
 
@@ -100,29 +89,36 @@ void main() {
   testWidgets(
       'Watchlist button should display Snackbar when added to watchlist',
       (WidgetTester tester) async {
-    // when(mockBloc.movieState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.movie).thenReturn(testMovieDetail);
-    // when(mockBloc.recommendationState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.movieRecommendations).thenReturn(<Movie>[]);
-    // when(mockBloc.isAddedToWatchlist).thenReturn(false);
-    // when(mockBloc.watchlistMessage).thenReturn('Added to Watchlist');
-
     when(() => detailBlocMovie.stream)
-        .thenAnswer((_) => Stream.value(DetailLoading()));
-    when(() => detailBlocMovie.state).thenReturn(DetailLoading());
+        .thenAnswer((_) => Stream.value(DetailStateMovie.initial().copyWith(
+              movieDetail: testMovieDetail,
+              detailStateMovie: RequestState.Loaded,
+              movieRecommendationsState: RequestState.Loaded,
+              isAddedToWatchlist: false,
+            )));
     when(() => detailBlocMovie.state)
-        .thenReturn(DetailHasData(testMovieDetail, testMovieList, false));
-    when(() => detailBlocMovie.movie).thenReturn(testMovieDetail);
-    when(() => detailBlocMovie.movieRecommendations).thenReturn(<Movie>[]);
-    when(() => detailBlocMovie.isAddedToWatchlist).thenReturn(false);
-    when(() => detailBlocMovie.watchlistMessage)
-        .thenReturn('Added to Watchlist');
+        .thenReturn(DetailStateMovie.initial().copyWith(
+      movieDetail: testMovieDetail,
+      detailStateMovie: RequestState.Loaded,
+      movieRecommendationsState: RequestState.Loaded,
+      isAddedToWatchlist: false,
+    ));
+    when(() => detailBlocMovie.add(AddWatchlist(testMovieDetail)))
+        .thenAnswer((_) async => {});
+
+    whenListen(
+        detailBlocMovie,
+        Stream.fromIterable([
+          detailBlocMovie.state.copyWith(watchlistMessage: 'Added to Watchlist')
+        ]));
 
     final watchlistButton = find.byType(ElevatedButton);
+    final watchlistButtonIcon = find.byIcon(Icons.add);
 
     await tester.pumpWidget(_makeTestableWidget(MovieDetailPage(id: 1)));
 
-    expect(find.byIcon(Icons.add), findsOneWidget);
+    expect(watchlistButton, findsOneWidget);
+    expect(watchlistButtonIcon, findsOneWidget);
 
     await tester.tap(watchlistButton);
     await tester.pump();
@@ -134,22 +130,28 @@ void main() {
   testWidgets(
       'Watchlist button should display AlertDialog when add to watchlist failed',
       (WidgetTester tester) async {
-    // when(mockBloc.movieState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.movie).thenReturn(testMovieDetail);
-    // when(mockBloc.recommendationState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.movieRecommendations).thenReturn(<Movie>[]);
-    // when(mockBloc.isAddedToWatchlist).thenReturn(false);
-    // when(mockBloc.watchlistMessage).thenReturn('Failed');
-
     when(() => detailBlocMovie.stream)
-        .thenAnswer((_) => Stream.value(DetailLoading()));
-    when(() => detailBlocMovie.state).thenReturn(DetailLoading());
+        .thenAnswer((_) => Stream.value(DetailStateMovie.initial().copyWith(
+              movieDetail: testMovieDetail,
+              detailStateMovie: RequestState.Loaded,
+              movieRecommendationsState: RequestState.Loaded,
+              isAddedToWatchlist: false,
+            )));
     when(() => detailBlocMovie.state)
-        .thenReturn(DetailHasData(testMovieDetail, testMovieList, false));
-    when(() => detailBlocMovie.movie).thenReturn(testMovieDetail);
-    when(() => detailBlocMovie.movieRecommendations).thenReturn(<Movie>[]);
-    when(() => detailBlocMovie.isAddedToWatchlist).thenReturn(false);
-    when(() => detailBlocMovie.watchlistMessage).thenReturn('Failed');
+        .thenReturn(DetailStateMovie.initial().copyWith(
+      movieDetail: testMovieDetail,
+      detailStateMovie: RequestState.Loaded,
+      movieRecommendationsState: RequestState.Loaded,
+      isAddedToWatchlist: false,
+    ));
+
+    when(() => detailBlocMovie.add(AddWatchlist(testMovieDetail)))
+        .thenAnswer((_) async => {});
+
+    whenListen(
+        detailBlocMovie,
+        Stream.fromIterable(
+            [detailBlocMovie.state.copyWith(watchlistMessage: 'Failed')]));
 
     final watchlistButton = find.byType(ElevatedButton);
 

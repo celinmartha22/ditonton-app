@@ -61,6 +61,21 @@ final testMovieDetail = MovieDetail(
   voteCount: 1,
 );
 
+final testMovieDetailEmpty = MovieDetail(
+  adult: false,
+  backdropPath: 'backdropPath',
+  genres: [],
+  id: 1,
+  originalTitle: 'originalTitle',
+  overview: 'overview',
+  posterPath: 'posterPath',
+  releaseDate: 'releaseDate',
+  runtime: 120,
+  title: 'title',
+  voteAverage: 1,
+  voteCount: 1,
+);
+
 final testTvDetail = TvDetail(
   backdropPath: 'backdropPath',
   firstAirDate: 'firstAirDate',
@@ -76,6 +91,23 @@ final testTvDetail = TvDetail(
   seasons: [
     Season(id: 1, name: 'Season 1', episodeCount: 12, posterPath: 'posterPath')
   ],
+  voteAverage: 1,
+  voteCount: 1,
+);
+
+final testTvDetailEmpty = TvDetail(
+  backdropPath: 'backdropPath',
+  firstAirDate: 'firstAirDate',
+  genres: [],
+  id: 1,
+  name: 'name',
+  originCountry: [],
+  originalLanguage: 'originalLanguage',
+  originalName: 'originalName',
+  overview: 'overview',
+  popularity: 1,
+  posterPath: 'posterPath',
+  seasons: [],
   voteAverage: 1,
   voteCount: 1,
 );

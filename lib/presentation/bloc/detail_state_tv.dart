@@ -1,69 +1,74 @@
 part of 'detail_bloc_tv.dart';
 
-abstract class DetailStateTv extends Equatable {
-  const DetailStateTv();
-  @override
-  List<Object> get props => [];
-}
-
-class DetailEmpty extends DetailStateTv {}
-
-class RecommendationEmpty extends DetailStateTv {}
-
-class DetailLoading extends DetailStateTv {}
-
-class RecommendationLoading extends DetailStateTv {}
-
-class DetailError extends DetailStateTv {
+class DetailStateTv extends Equatable {
+  final TvDetail? tvDetail;
+  final RequestState detailStateTv;
+  final List<Tv> tvRecommendations;
+  final RequestState tvRecommendationsState;
+  final bool isAddedToWatchlist;
   final String message;
-  DetailError(this.message);
+  final String watchlistMessage;
+  DetailStateTv({
+    required this.tvDetail,
+    required this.detailStateTv,
+    required this.tvRecommendations,
+    required this.tvRecommendationsState,
+    required this.isAddedToWatchlist,
+    required this.message,
+    required this.watchlistMessage,
+  });
+  DetailStateTv copyWith({
+    TvDetail? tvDetail,
+    RequestState? detailStateTv,
+    List<Tv>? tvRecommendations,
+    RequestState? tvRecommendationsState,
+    bool? isAddedToWatchlist,
+    String? message,
+    String? watchlistMessage,
+  }) {
+    return DetailStateTv(
+      tvDetail: tvDetail ?? this.tvDetail,
+      detailStateTv: detailStateTv ?? this.detailStateTv,
+      tvRecommendations: tvRecommendations ?? this.tvRecommendations,
+      tvRecommendationsState:
+          tvRecommendationsState ?? this.tvRecommendationsState,
+      isAddedToWatchlist: isAddedToWatchlist ?? this.isAddedToWatchlist,
+      message: message ?? this.message,
+      watchlistMessage: watchlistMessage ?? this.watchlistMessage,
+    );
+  }
+
+  factory DetailStateTv.initial() => DetailStateTv(
+      tvDetail: TvDetail(
+          backdropPath: 'backdropPath',
+          firstAirDate: 'firstAirDate',
+          genres: <Genre>[],
+          id: 1,
+          name: 'name',
+          originCountry: <String>[],
+          originalLanguage: 'originalLanguage',
+          originalName: 'originalName',
+          overview: 'overview',
+          popularity: 1,
+          posterPath: 'posterPath',
+          seasons: <Season>[],
+          voteAverage: 1,
+          voteCount: 1),
+      detailStateTv: RequestState.Empty,
+      tvRecommendations: <Tv>[],
+      tvRecommendationsState: RequestState.Empty,
+      isAddedToWatchlist: false,
+      message: '',
+      watchlistMessage: '');
 
   @override
-  List<Object> get props => [message];
-}
-
-class RecommendationError extends DetailStateTv {
-  final String message;
-  RecommendationError(this.message);
-
-  @override
-  List<Object> get props => [message];
-}
-
-class DetailHasData extends DetailStateTv {
-  final TvDetail detail;
-  final List<Tv> recommendationTvSeries;
-  final bool isAddedtoWatchlist;
-
-  DetailHasData(
-      this.detail, this.recommendationTvSeries, this.isAddedtoWatchlist);
-
-  @override
-  List<Object> get props => [detail, recommendationTvSeries, isAddedtoWatchlist];
-}
-
-class RecommendationHasData extends DetailStateTv {
-  final List<Tv> tvSeries;
-
-  RecommendationHasData(this.tvSeries);
-
-  @override
-  List<Object> get props => [tvSeries];
-}
-
-class DetailHasStatus extends DetailStateTv {
-  final bool isAddedtoWatchlist;
-
-  DetailHasStatus(this.isAddedtoWatchlist);
-
-  @override
-  List<Object> get props => [isAddedtoWatchlist];
-}
-
-class DetailHasMessage extends DetailStateTv {
-  final String message;
-  DetailHasMessage(this.message);
-
-  @override
-  List<Object> get props => [message];
+  List<Object?> get props => [
+    tvDetail,
+    detailStateTv,
+    tvRecommendations,
+    tvRecommendationsState,
+    isAddedToWatchlist,
+    message,
+    watchlistMessage
+  ];
 }

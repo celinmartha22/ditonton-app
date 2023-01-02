@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:ditonton/common/failure.dart';
+import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/tv.dart';
 import 'package:ditonton/domain/usecases/get_tv_detail.dart';
 import 'package:ditonton/domain/usecases/get_tv_recommendations.dart';
@@ -37,35 +38,39 @@ void main() {
       mockGetWatchlistStatusTv = MockGetWatchListStatusTv();
       mockSaveTvWatchlist = MockSaveTvWatchlist();
       mockRemoveTvWatchlist = MockRemoveTvWatchlist();
-      detailBlocTv = DetailBlocTv(mockGetTvDetail, mockGetTvRecommendations,
-          mockGetWatchlistStatusTv, mockSaveTvWatchlist, mockRemoveTvWatchlist);
+      detailBlocTv = DetailBlocTv(
+          getTvDetail: mockGetTvDetail,
+          getTvRecommendations: mockGetTvRecommendations,
+          getWatchListStatus: mockGetWatchlistStatusTv,
+          saveWatchlist: mockSaveTvWatchlist,
+          removeWatchlist: mockRemoveTvWatchlist);
     },
   );
 
   test(
     'initial state should be empty',
     () {
-      expect(detailBlocTv.state, DetailEmpty());
+      expect(detailBlocTv.state.detailStateTv, RequestState.Empty);
     },
   );
 
   final tId = 1;
-  final tWatchlistStatus = true;
+
   final tTv = Tv(
-    backdropPath: '/muth4OYamXf41G2evdrLEg8d3om.jpg',
-    firstAirDate: 'firstAirDate',
-    genreIds: [14, 28],
-    id: 557,
-    name: 'Spiderman',
-    originCountry: ['US'],
-    originalLanguage: 'originalLanguage',
-    originalName: 'originalName',
-    overview:
-        'After being bitten by a genetically altered spider, nerdy high school student Peter Parker is endowed with amazing powers to become the Amazing superhero known as Spider-Man.',
-    popularity: 60.441,
-    posterPath: '/rweIrveL43TaxUN0akQEaAXL6x0.jpg',
-    voteAverage: 7.2,
-    voteCount: 13507,
+  backdropPath: '/muth4OYamXf41G2evdrLEg8d3om.jpg',
+  firstAirDate: 'firstAirDate',
+  genreIds: [14, 28],
+  id: 557,
+  name: 'Spiderman',
+  originCountry: ['US'],
+  originalLanguage: 'originalLanguage',
+  originalName: 'originalName',
+  overview:
+      'After being bitten by a genetically altered spider, nerdy high school student Peter Parker is endowed with amazing powers to become the Amazing superhero known as Spider-Man.',
+  popularity: 60.441,
+  posterPath: '/rweIrveL43TaxUN0akQEaAXL6x0.jpg',
+  voteAverage: 7.2,
+  voteCount: 13507,
   );
   final tTvSeries = <Tv>[tTv];
 
@@ -89,7 +94,7 @@ void main() {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailTv(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) {
         verify(mockGetTvDetail.execute(tId));
         verify(mockGetTvRecommendations.execute(tId));
@@ -102,12 +107,29 @@ void main() {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailTv(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tTvSeries),
-        DetailHasData(testTvDetail, tTvSeries, tWatchlistStatus),
+       DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Loading,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: tTvSeries,
+            tvRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
 
@@ -117,27 +139,61 @@ void main() {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailTv(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tTvSeries),
-        DetailHasData(testTvDetail, tTvSeries, tWatchlistStatus),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Loading,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: tTvSeries,
+            tvRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
 
     blocTest<DetailBlocTv, DetailStateTv>(
-      'should change recommendation Tvs when data is gotten successfull',
+      'should change recommendation Tv Series when data is gotten successfull',
       build: () {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailTv(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tTvSeries),
-        DetailHasData(testTvDetail, tTvSeries, tWatchlistStatus),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Loading,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: tTvSeries,
+            tvRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
   });
@@ -149,13 +205,30 @@ void main() {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailTv(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) => verify(mockGetTvRecommendations.execute(tId)),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tTvSeries),
-        DetailHasData(testTvDetail, tTvSeries, tWatchlistStatus),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Loading,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: tTvSeries,
+            tvRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
 
@@ -165,12 +238,29 @@ void main() {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailTv(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tTvSeries),
-        DetailHasData(testTvDetail, tTvSeries, tWatchlistStatus),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Loading,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: tTvSeries,
+            tvRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
 
@@ -190,12 +280,29 @@ void main() {
         return detailBlocTv;
       },
       act: (bloc) => bloc.add(GetDetailTv(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationError('Server Failure'),
-        DetailHasData(testTvDetail, <Tv>[], false),
+                DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Loading,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Error,
+            isAddedToWatchlist: false,
+            message: 'Server Failure'),
       ],
     );
   });
@@ -204,15 +311,13 @@ void main() {
     blocTest<DetailBlocTv, DetailStateTv>(
       'should get the watchlist status',
       build: () {
-        when(mockGetWatchlistStatusTv.execute(tId))
-            .thenAnswer((_) async => true);
+        when(mockGetWatchlistStatusTv.execute(tId)).thenAnswer((_) async => true);
         return detailBlocTv;
       },
       act: (bloc) => bloc.add(LoadWatchlistStatus(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        DetailHasStatus(true),
+        DetailStateTv.initial().copyWith(isAddedToWatchlist: true),
       ],
     );
 
@@ -226,7 +331,7 @@ void main() {
         return detailBlocTv;
       },
       act: (bloc) => bloc.add(AddWatchlist(testTvDetail)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) => verify(mockSaveTvWatchlist.execute(testTvDetail)),
     );
 
@@ -240,7 +345,7 @@ void main() {
         return detailBlocTv;
       },
       act: (bloc) => bloc.add(RemoveFromWatchlist(testTvDetail)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) => verify(mockRemoveTvWatchlist.execute(testTvDetail)),
     );
 
@@ -254,14 +359,26 @@ void main() {
         return detailBlocTv;
       },
       act: (bloc) => bloc.add(AddWatchlist(testTvDetail)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) =>
           verify(mockGetWatchlistStatusTv.execute(testTvDetail.id)),
       expect: () => [
-        DetailLoading(),
-        DetailHasMessage('Added to Watchlist'),
-        DetailLoading(),
-        DetailHasStatus(true),
+                 DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Empty,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: '',
+            watchlistMessage: 'Added to Watchlist'),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Empty,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: true,
+            message: '',
+            watchlistMessage: 'Added to Watchlist'),
       ],
     );
 
@@ -275,12 +392,16 @@ void main() {
         return detailBlocTv;
       },
       act: (bloc) => bloc.add(AddWatchlist(testTvDetail)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        DetailError('Failed'),
-        DetailLoading(),
-        DetailHasStatus(false),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Empty,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: '',
+            watchlistMessage: 'Failed'),
       ],
     );
   });
@@ -302,8 +423,23 @@ void main() {
         return detailBlocTv;
       },
       act: (bloc) => bloc.add(GetDetailTv(tId)),
-      wait: const Duration(milliseconds: 1000),
-      expect: () => [DetailLoading(), DetailError('Server Failure')],
+      wait: const Duration(milliseconds: 5000),
+      expect: () => [
+          DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Loading,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Error,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: 'Server Failure'),
+      ],
     );
   });
 
@@ -313,12 +449,29 @@ void main() {
       return arrangeUsecase();
     },
     act: (bloc) => bloc.add(GetDetailTv(tId)),
-    wait: const Duration(milliseconds: 1000),
+    wait: const Duration(milliseconds: 5000),
     expect: () => [
-      DetailLoading(),
-      RecommendationLoading(),
-      RecommendationHasData(tTvSeries),
-      DetailHasData(testTvDetail, tTvSeries, tWatchlistStatus),
+      DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Loading,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetail,
+            detailStateTv: RequestState.Loaded,
+            tvRecommendations: tTvSeries,
+            tvRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
     ],
     verify: (bloc) {
       verify(mockGetTvDetail.execute(tId));
@@ -332,8 +485,7 @@ void main() {
           .thenAnswer((_) async => left(ServerFailure('Server Failure')));
       when(mockGetTvRecommendations.execute(tId))
           .thenAnswer((_) async => left(ServerFailure('Server Failure')));
-      when(mockGetWatchlistStatusTv.execute(tId))
-          .thenAnswer((_) async => false);
+      when(mockGetWatchlistStatusTv.execute(tId)).thenAnswer((_) async => false);
       when(mockSaveTvWatchlist.execute(testTvDetail))
           .thenAnswer((_) async => Right('Failed'));
       when(mockRemoveTvWatchlist.execute(testTvDetail))
@@ -341,10 +493,22 @@ void main() {
       return detailBlocTv;
     },
     act: (bloc) => bloc.add(GetDetailTv(tId)),
-    wait: const Duration(milliseconds: 1000),
+    wait: const Duration(milliseconds: 5000),
     expect: () => [
-      DetailLoading(),
-      DetailError('Server Failure'),
+          DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Loading,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateTv.initial().copyWith(
+            tvDetail: testTvDetailEmpty,
+            detailStateTv: RequestState.Error,
+            tvRecommendations: <Tv>[],
+            tvRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: 'Server Failure'),
     ],
     verify: (bloc) {
       verify(mockGetTvDetail.execute(tId));

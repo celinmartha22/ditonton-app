@@ -1,18 +1,13 @@
-// import 'package:ditonton/common/state_enum.dart';
-import 'package:ditonton/domain/entities/tv.dart';
+import 'package:bloc_test/bloc_test.dart';
+import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/presentation/bloc/detail_bloc_tv.dart';
 import 'package:ditonton/presentation/pages/tv_detail_page.dart';
-// import 'package:ditonton/presentation/provider/tv_detail_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-// import 'package:mockito/annotations.dart';
-// import 'package:mockito/mockito.dart';
 import 'package:mocktail/mocktail.dart';
-// import 'package:provider/provider.dart';
 
 import '../../dummy_data/dummy_objects.dart';
-// import 'tv_detail_page_test.mocks.dart';
 
 class MockDetailBlocTv extends Mock implements DetailBlocTv {}
 
@@ -45,25 +40,18 @@ void main() {
       'Watchlist button should display add icon when Tv not added to watchlist',
       (WidgetTester tester) async {
     when(() => detailBlocTv.stream)
-        .thenAnswer((_) => Stream.value(DetailLoading()));
-    when(() => detailBlocTv.state).thenReturn(DetailLoading());
-    // when(() => detailBlocTv.stream).thenAnswer((_) => Stream.value(
-    //     DetailHasData(testTvDetail, testTvList, testIsAddedToWatchlist)));
-    when(() => detailBlocTv.state)
-        .thenReturn(DetailHasData(testTvDetail, testTvList, false));
-    when(() => detailBlocTv.tv).thenReturn(testTvDetail);
-    when(() => detailBlocTv.tvRecommendations).thenReturn(<Tv>[]);
-    when(() => detailBlocTv.isAddedToWatchlist).thenReturn(false);
-    // when(() => detailBlocTv.stream).thenAnswer((_) => Stream.value(
-    //     DetailHasData(testTvDetail, testTvList, testIsAddedToWatchlist)));
-    // when(() => detailBlocTv.).thenReturn(
-    //     DetailHasData(testTvDetail, testTvList, testIsAddedToWatchlist));
-
-    // when(mockBloc.TvState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.Tv).thenReturn(testTvDetail);
-    // when(mockBloc.recommendationState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.TvRecommendations).thenReturn(<Tv>[]);
-    // when(mockBloc.isAddedToWatchlist).thenReturn(false);
+        .thenAnswer((_) => Stream.value(DetailStateTv.initial().copyWith(
+              tvDetail: testTvDetail,
+              detailStateTv: RequestState.Loaded,
+              tvRecommendationsState: RequestState.Loaded,
+              isAddedToWatchlist: false,
+            )));
+    when(() => detailBlocTv.state).thenReturn(DetailStateTv.initial().copyWith(
+      tvDetail: testTvDetail,
+      detailStateTv: RequestState.Loaded,
+      tvRecommendationsState: RequestState.Loaded,
+      isAddedToWatchlist: false,
+    ));
 
     final watchlistButtonIcon = find.byIcon(Icons.add);
 
@@ -76,21 +64,20 @@ void main() {
       'Watchlist button should dispay check icon when Tv is added to wathclist',
       (WidgetTester tester) async {
     when(() => detailBlocTv.stream)
-        .thenAnswer((_) => Stream.value(DetailLoading()));
-    when(() => detailBlocTv.state).thenReturn(DetailLoading());
-    when(() => detailBlocTv.state)
-        .thenReturn(DetailHasData(testTvDetail, testTvList, true));
-    when(() => detailBlocTv.tv).thenReturn(testTvDetail);
-    when(() => detailBlocTv.tvRecommendations).thenReturn(<Tv>[]);
-    when(() => detailBlocTv.isAddedToWatchlist).thenReturn(true);
-    // when(mockBloc.TvState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.Tv).thenReturn(testTvDetail);
-    // when(mockBloc.recommendationState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.TvRecommendations).thenReturn(<Tv>[]);
-    // when(mockBloc.isAddedToWatchlist).thenReturn(true);
+        .thenAnswer((_) => Stream.value(DetailStateTv.initial().copyWith(
+              tvDetail: testTvDetail,
+              detailStateTv: RequestState.Loaded,
+              tvRecommendationsState: RequestState.Loaded,
+              isAddedToWatchlist: true,
+            )));
+    when(() => detailBlocTv.state).thenReturn(DetailStateTv.initial().copyWith(
+      tvDetail: testTvDetail,
+      detailStateTv: RequestState.Loaded,
+      tvRecommendationsState: RequestState.Loaded,
+      isAddedToWatchlist: true,
+    ));
 
-    // final watchlistButtonIcon = find.byIcon(Icons.check);
-    final watchlistButtonIcon = find.text('Watchlist');
+    final watchlistButtonIcon = find.byIcon(Icons.check);
 
     await tester.pumpWidget(_makeTestableWidget(TvDetailPage(id: 1)));
 
@@ -100,29 +87,35 @@ void main() {
   testWidgets(
       'Watchlist button should display Snackbar when added to watchlist',
       (WidgetTester tester) async {
-    // when(mockBloc.TvState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.Tv).thenReturn(testTvDetail);
-    // when(mockBloc.recommendationState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.TvRecommendations).thenReturn(<Tv>[]);
-    // when(mockBloc.isAddedToWatchlist).thenReturn(false);
-    // when(mockBloc.watchlistMessage).thenReturn('Added to Watchlist');
-
     when(() => detailBlocTv.stream)
-        .thenAnswer((_) => Stream.value(DetailLoading()));
-    when(() => detailBlocTv.state).thenReturn(DetailLoading());
-    when(() => detailBlocTv.state)
-        .thenReturn(DetailHasData(testTvDetail, testTvList, false));
-    when(() => detailBlocTv.tv).thenReturn(testTvDetail);
-    when(() => detailBlocTv.tvRecommendations).thenReturn(<Tv>[]);
-    when(() => detailBlocTv.isAddedToWatchlist).thenReturn(false);
-    when(() => detailBlocTv.watchlistMessage)
-        .thenReturn('Added to Watchlist');
+        .thenAnswer((_) => Stream.value(DetailStateTv.initial().copyWith(
+              tvDetail: testTvDetail,
+              detailStateTv: RequestState.Loaded,
+              tvRecommendationsState: RequestState.Loaded,
+              isAddedToWatchlist: false,
+            )));
+    when(() => detailBlocTv.state).thenReturn(DetailStateTv.initial().copyWith(
+      tvDetail: testTvDetail,
+      detailStateTv: RequestState.Loaded,
+      tvRecommendationsState: RequestState.Loaded,
+      isAddedToWatchlist: false,
+    ));
+    when(() => detailBlocTv.add(AddWatchlist(testTvDetail)))
+        .thenAnswer((_) async => {});
+
+    whenListen(
+        detailBlocTv,
+        Stream.fromIterable([
+          detailBlocTv.state.copyWith(watchlistMessage: 'Added to Watchlist')
+        ]));
 
     final watchlistButton = find.byType(ElevatedButton);
+    final watchlistButtonIcon = find.byIcon(Icons.add);
 
     await tester.pumpWidget(_makeTestableWidget(TvDetailPage(id: 1)));
 
-    expect(find.byIcon(Icons.add), findsOneWidget);
+    expect(watchlistButton, findsOneWidget);
+    expect(watchlistButtonIcon, findsOneWidget);
 
     await tester.tap(watchlistButton);
     await tester.pump();
@@ -134,22 +127,27 @@ void main() {
   testWidgets(
       'Watchlist button should display AlertDialog when add to watchlist failed',
       (WidgetTester tester) async {
-    // when(mockBloc.TvState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.Tv).thenReturn(testTvDetail);
-    // when(mockBloc.recommendationState).thenReturn(RequestState.Loaded);
-    // when(mockBloc.TvRecommendations).thenReturn(<Tv>[]);
-    // when(mockBloc.isAddedToWatchlist).thenReturn(false);
-    // when(mockBloc.watchlistMessage).thenReturn('Failed');
-
     when(() => detailBlocTv.stream)
-        .thenAnswer((_) => Stream.value(DetailLoading()));
-    when(() => detailBlocTv.state).thenReturn(DetailLoading());
-    when(() => detailBlocTv.state)
-        .thenReturn(DetailHasData(testTvDetail, testTvList, false));
-    when(() => detailBlocTv.tv).thenReturn(testTvDetail);
-    when(() => detailBlocTv.tvRecommendations).thenReturn(<Tv>[]);
-    when(() => detailBlocTv.isAddedToWatchlist).thenReturn(false);
-    when(() => detailBlocTv.watchlistMessage).thenReturn('Failed');
+        .thenAnswer((_) => Stream.value(DetailStateTv.initial().copyWith(
+              tvDetail: testTvDetail,
+              detailStateTv: RequestState.Loaded,
+              tvRecommendationsState: RequestState.Loaded,
+              isAddedToWatchlist: false,
+            )));
+    when(() => detailBlocTv.state).thenReturn(DetailStateTv.initial().copyWith(
+      tvDetail: testTvDetail,
+      detailStateTv: RequestState.Loaded,
+      tvRecommendationsState: RequestState.Loaded,
+      isAddedToWatchlist: false,
+    ));
+
+    when(() => detailBlocTv.add(AddWatchlist(testTvDetail)))
+        .thenAnswer((_) async => {});
+
+    whenListen(
+        detailBlocTv,
+        Stream.fromIterable(
+            [detailBlocTv.state.copyWith(watchlistMessage: 'Failed')]));
 
     final watchlistButton = find.byType(ElevatedButton);
 

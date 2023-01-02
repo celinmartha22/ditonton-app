@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:ditonton/common/failure.dart';
+import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/movie.dart';
 import 'package:ditonton/domain/usecases/get_movie_detail.dart';
 import 'package:ditonton/domain/usecases/get_movie_recommendations.dart';
@@ -38,24 +39,24 @@ void main() {
       mockSaveWatchlist = MockSaveWatchlist();
       mockRemoveWatchlist = MockRemoveWatchlist();
       detailBlocMovie = DetailBlocMovie(
-          mockGetMovieDetail,
-          mockGetMovieRecommendations,
-          mockGetWatchlistStatus,
-          mockSaveWatchlist,
-          mockRemoveWatchlist);
+          getMovieDetail: mockGetMovieDetail,
+          getMovieRecommendations: mockGetMovieRecommendations,
+          getWatchListStatus: mockGetWatchlistStatus,
+          saveWatchlist: mockSaveWatchlist,
+          removeWatchlist: mockRemoveWatchlist);
     },
   );
 
   test(
     'initial state should be empty',
     () {
-      expect(detailBlocMovie.state, DetailEmpty());
+      expect(detailBlocMovie.state.detailStateMovie, RequestState.Empty);
     },
   );
 
   final tId = 1;
-  final tWatchlistStatus = true;
-  final tTv = Movie(
+
+  final tMovie = Movie(
     adult: false,
     backdropPath: '/muth4OYamXf41G2evdrLEg8d3om.jpg',
     genreIds: [14, 28],
@@ -71,7 +72,7 @@ void main() {
     voteAverage: 7.2,
     voteCount: 13507,
   );
-  final tMovies = <Movie>[tTv];
+  final tMovies = <Movie>[tMovie];
 
   arrangeUsecase() {
     when(mockGetMovieDetail.execute(tId))
@@ -86,14 +87,14 @@ void main() {
     return detailBlocMovie;
   }
 
-  group('Get Tv Detail', () {
+  group('Get Movie Detail', () {
     blocTest<DetailBlocMovie, DetailStateMovie>(
       'should get data from the usecase',
       build: () {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailMovie(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) {
         verify(mockGetMovieDetail.execute(tId));
         verify(mockGetMovieRecommendations.execute(tId));
@@ -106,60 +107,128 @@ void main() {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailMovie(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tMovies),
-        DetailHasData(testMovieDetail, tMovies, tWatchlistStatus),
+       DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Loading,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: tMovies,
+            movieRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
 
     blocTest<DetailBlocMovie, DetailStateMovie>(
-      'should change Tv when data is gotten successfully',
+      'should change Movie when data is gotten successfully',
       build: () {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailMovie(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tMovies),
-        DetailHasData(testMovieDetail, tMovies, tWatchlistStatus),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Loading,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: tMovies,
+            movieRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
 
     blocTest<DetailBlocMovie, DetailStateMovie>(
-      'should change recommendation Tvs when data is gotten successfull',
+      'should change recommendation Movies when data is gotten successfull',
       build: () {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailMovie(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tMovies),
-        DetailHasData(testMovieDetail, tMovies, tWatchlistStatus),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Loading,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: tMovies,
+            movieRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
   });
 
-  group('Get Tv Recommendations', () {
+  group('Get Movie Recommendations', () {
     blocTest<DetailBlocMovie, DetailStateMovie>(
       'should get data from the usecase',
       build: () {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailMovie(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) => verify(mockGetMovieRecommendations.execute(tId)),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tMovies),
-        DetailHasData(testMovieDetail, tMovies, tWatchlistStatus),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Loading,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: tMovies,
+            movieRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
 
@@ -169,12 +238,29 @@ void main() {
         return arrangeUsecase();
       },
       act: (bloc) => bloc.add(GetDetailMovie(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationHasData(tMovies),
-        DetailHasData(testMovieDetail, tMovies, tWatchlistStatus),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Loading,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: tMovies,
+            movieRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
       ],
     );
 
@@ -194,12 +280,29 @@ void main() {
         return detailBlocMovie;
       },
       act: (bloc) => bloc.add(GetDetailMovie(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        RecommendationLoading(),
-        RecommendationError('Server Failure'),
-        DetailHasData(testMovieDetail, <Movie>[], false),
+                DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Loading,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Error,
+            isAddedToWatchlist: false,
+            message: 'Server Failure'),
       ],
     );
   });
@@ -212,10 +315,9 @@ void main() {
         return detailBlocMovie;
       },
       act: (bloc) => bloc.add(LoadWatchlistStatus(tId)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        DetailHasStatus(true),
+        DetailStateMovie.initial().copyWith(isAddedToWatchlist: true),
       ],
     );
 
@@ -229,7 +331,7 @@ void main() {
         return detailBlocMovie;
       },
       act: (bloc) => bloc.add(AddWatchlist(testMovieDetail)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) => verify(mockSaveWatchlist.execute(testMovieDetail)),
     );
 
@@ -243,7 +345,7 @@ void main() {
         return detailBlocMovie;
       },
       act: (bloc) => bloc.add(RemoveFromWatchlist(testMovieDetail)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) => verify(mockRemoveWatchlist.execute(testMovieDetail)),
     );
 
@@ -257,14 +359,26 @@ void main() {
         return detailBlocMovie;
       },
       act: (bloc) => bloc.add(AddWatchlist(testMovieDetail)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       verify: (bloc) =>
           verify(mockGetWatchlistStatus.execute(testMovieDetail.id)),
       expect: () => [
-        DetailLoading(),
-        DetailHasMessage('Added to Watchlist'),
-        DetailLoading(),
-        DetailHasStatus(true),
+                 DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Empty,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: '',
+            watchlistMessage: 'Added to Watchlist'),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Empty,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: true,
+            message: '',
+            watchlistMessage: 'Added to Watchlist'),
       ],
     );
 
@@ -278,12 +392,16 @@ void main() {
         return detailBlocMovie;
       },
       act: (bloc) => bloc.add(AddWatchlist(testMovieDetail)),
-      wait: const Duration(milliseconds: 1000),
+      wait: const Duration(milliseconds: 5000),
       expect: () => [
-        DetailLoading(),
-        DetailError('Failed'),
-        DetailLoading(),
-        DetailHasStatus(false),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Empty,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: '',
+            watchlistMessage: 'Failed'),
       ],
     );
   });
@@ -305,8 +423,23 @@ void main() {
         return detailBlocMovie;
       },
       act: (bloc) => bloc.add(GetDetailMovie(tId)),
-      wait: const Duration(milliseconds: 1000),
-      expect: () => [DetailLoading(), DetailError('Server Failure')],
+      wait: const Duration(milliseconds: 5000),
+      expect: () => [
+          DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Loading,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Error,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: 'Server Failure'),
+      ],
     );
   });
 
@@ -316,12 +449,29 @@ void main() {
       return arrangeUsecase();
     },
     act: (bloc) => bloc.add(GetDetailMovie(tId)),
-    wait: const Duration(milliseconds: 1000),
+    wait: const Duration(milliseconds: 5000),
     expect: () => [
-      DetailLoading(),
-      RecommendationLoading(),
-      RecommendationHasData(tMovies),
-      DetailHasData(testMovieDetail, tMovies, tWatchlistStatus),
+      DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Loading,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetail,
+            detailStateMovie: RequestState.Loaded,
+            movieRecommendations: tMovies,
+            movieRecommendationsState: RequestState.Loaded,
+            isAddedToWatchlist: false,
+            message: ''),
     ],
     verify: (bloc) {
       verify(mockGetMovieDetail.execute(tId));
@@ -343,10 +493,22 @@ void main() {
       return detailBlocMovie;
     },
     act: (bloc) => bloc.add(GetDetailMovie(tId)),
-    wait: const Duration(milliseconds: 1000),
+    wait: const Duration(milliseconds: 5000),
     expect: () => [
-      DetailLoading(),
-      DetailError('Server Failure'),
+          DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Loading,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: ''),
+        DetailStateMovie.initial().copyWith(
+            movieDetail: testMovieDetailEmpty,
+            detailStateMovie: RequestState.Error,
+            movieRecommendations: <Movie>[],
+            movieRecommendationsState: RequestState.Empty,
+            isAddedToWatchlist: false,
+            message: 'Server Failure'),
     ],
     verify: (bloc) {
       verify(mockGetMovieDetail.execute(tId));
